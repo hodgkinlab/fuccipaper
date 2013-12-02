@@ -154,7 +154,7 @@ if (0)
 	vAxesSisBot = [h5, h6, h7, h8];
 end
 % sister corr. red: two columns, width = 7.01 inches
-if (1)
+if (0)
 	width = 7.01; ratio = 0.28;
 	fSRed = figure('Name', 'sis red', 'Position', [5 50 900 900*ratio]);
 	set(gcf, ...
@@ -342,7 +342,7 @@ for iExp = 1:numel(par.sExpNames)
 			vb = vb(:);
 			
 			vProbStep = 1/double(numel(vc));
-			vt = 0:1:35;
+			vt = 0:0.01:35;
 			xLimA = 10;
 			xLimB = 20;
 			%xLimC = 30;
@@ -451,7 +451,7 @@ for iExp = 1:numel(par.sExpNames)
 			end
 			
 			model = []; model.name = 'exp+gauss';
-			if (1)
+			if (0)
 				model.clr = 'r';
 				model.style = '-';
 				
@@ -496,7 +496,7 @@ for iExp = 1:numel(par.sExpNames)
 			end
 			
 			model.name = 'stretched lognormal';
-			if (1)
+			if (0)
 				model.clr = 'g';
 				model.style = '-';
 				vParam = lognfit(vc);

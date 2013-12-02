@@ -87,7 +87,10 @@ load(par.sDataFile, 'mCellData');
 
 vPos = mCellData(:,idxData.pos);
 vGroups = zeros(size(mCellData, 1), 1);
-vGroups((vPos >= 1) & (vPos <= 36)) = 1;
+vGroups((vPos >= 1) & (vPos <= 36)) = 1; % 40ug/mL
+%vGroups((vPos >= 37) & (vPos <= 72)) = 1; % 10ug/mL
+%vGroups((vPos >= 109) & (vPos <= 144)) = 1; % 2.5ug/mL
+%vGroups((vPos >= 73) & (vPos <= 108)) = 1; % 0.625ug/mL
 groupNames = {'B cells, \alphaCD40'}; % 40 ug/mL aCD40
 save(par.sInfoFile, 'nMinPerFrame', 'vGroups', 'groupNames');
 end
