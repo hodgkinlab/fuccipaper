@@ -35,6 +35,8 @@ data/
 boundsS1.mat
 boundsS3.mat
 
+Script [runBootstrapParamsS2.m] produces bootstrapped confidence intervals for parameters from Supplementary Table S2. The intervals are printed in the console.
+
 
 === Section 2: Processing FACS data ===
 File "data/SH1.93 G2M summary.xlsx" contains gated FACS results from the BrdU treatment experiment. "All in division" tab contains results for a dividing population (i.e., undivided cells are excluded). In this tab, the numbers are percentages out of total number of live dividing cells. For each gate, columns show triplicates.
