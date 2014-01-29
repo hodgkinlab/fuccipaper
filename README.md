@@ -29,6 +29,12 @@ data/
 20120316-info.mat
 20120413-info.mat
 
+Scripts [runBootstrapParamsS1.m] and [runBootstrapParamsS3.m] produce bootstrapped confidence intervals for parameters from Supplementary Tables S1 amd S3. These scripts create files
+
+data/
+boundsS1.mat
+boundsS3.mat
+
 
 === Section 2: Processing FACS data ===
 File "data/SH1.93 G2M summary.xlsx" contains gated FACS results from the BrdU treatment experiment. "All in division" tab contains results for a dividing population (i.e., undivided cells are excluded). In this tab, the numbers are percentages out of total number of live dividing cells. For each gate, columns show triplicates.
