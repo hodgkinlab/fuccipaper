@@ -46,12 +46,15 @@ parStretCD8 = NaN(1, nSamples);
 parConstCD8 = NaN(1, nSamples);
 
 n = numel(mCpG);
+rowIdx = repmat(1:size(mCpG, 1), size(mCpG, 2), 1)';
 
 matlabpool open;
 parfor i = 1:nSamples
 	randIndex = randsample(3, n, true);
-	randIndex = reshape(randIndex, size(mCpG));
-	parSample = fitOneSample(ctx, mCpG, mCD8, randIndex);
+	colIdx = reshape(randIndex, size(mCpG));
+	currCpG = mCpG(sub2ind(size(mCpG), rowIdx, colIdx));
+	currCD8 = mCD8(sub2ind(size(mCD8), rowIdx, colIdx));
+	parSample = fitOneSample(ctx, currCpG, currCD8);
 	parStretCpG(i) = parSample(1);
 	parConstCpG(i) = parSample(2);
 	parStretCD8(i) = parSample(3);
@@ -66,9 +69,7 @@ prctile(parConstCD8, [2.5, 97.5])./60
 
 end
 
-function parSample = fitOneSample(ctx, mCpG, mCD8, randIndex)
-currCpG = mCpG(randIndex);
-currCD8 = mCD8(randIndex);
+function parSample = fitOneSample(ctx, currCpG, currCD8)
 
 % CpG B cells, MLE lognormal uLog = 12.34; sLog = 3.48 hours
 ctx.printFcn = @printStretchedG2M;
