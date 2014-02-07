@@ -101,7 +101,7 @@ for iExp = 1:numel(par.sExpNames)
 		boundsLo(iExp,:) = mLims(1,:);
 		boundsHi(iExp,:) = mLims(2,:);
 		
-		a = mParams(:,5);
+		a = mParams(:,6);
 		fprintf('exp-gauss failed in %d%% of cases\n', ...
 			round(100*sum(isnan(a))/numel(a)));
 		
@@ -165,9 +165,13 @@ mParamsSample(5) = uaUpBnd;
 
 % m = mean(T);
 y = skewness(T);
-% uHat = m - s*nthroot(y/2, 3);
-% sHat = s*s*(1 - nthroot(y/2, 3).^2);
-kHat = s*nthroot(y/2, 3);
+if (y <= 0)
+	kHat = NaN;
+else
+	% uHat = m - s*nthroot(y/2, 3);
+	% sHat = s*s*(1 - nthroot(y/2, 3).^2);
+	kHat = s*nthroot(y/2, 3);
+end
 mParamsSample(6) = kHat;
 
 cv = cov(ab1(:), b2(:));
