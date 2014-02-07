@@ -174,25 +174,25 @@ disp(' ');
 disp(num2str(boundsHi - boundsLo >= 0));
 
 for i = 1:4
-	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(1,2), boundsHi(1,2));
-	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(1,1), boundsHi(1,1));
+	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(i,2), boundsHi(i,2));
+	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(i,1), boundsHi(i,1));
 	
-	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(1,3), boundsHi(1,3));
-	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(1,4), boundsHi(1,4));
-	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(1,5), boundsHi(1,5));
+	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(i,3), boundsHi(i,3));
+	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(i,4), boundsHi(i,4));
+	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(i,5), boundsHi(i,5));
 	
-	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(1,6), boundsHi(1,6));
-	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(1,7), boundsHi(1,7));
+	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(i,6), boundsHi(i,6));
+	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(i,7), boundsHi(i,7));
 	
-	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(1,8), boundsHi(1,8));
-	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(1,9), boundsHi(1,9));
+	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(i,8), boundsHi(i,8));
+	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(i,9), boundsHi(i,9));
 	
-	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(1,11), boundsHi(1,11));
-	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(1,10), boundsHi(1,10));
+	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(i,11), boundsHi(i,11));
+	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(i,10), boundsHi(i,10));
 	
-	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(1,13), boundsHi(1,13));
-	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(1,14), boundsHi(1,14));
-	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(1,12), boundsHi(1,12));
+	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(i,13), boundsHi(i,13));
+	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(i,14), boundsHi(i,14));
+	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(i,12), boundsHi(i,12));
 	
 	fprintf(' ---------------- \n\n');
 end
