@@ -104,7 +104,11 @@ for iExp = 1:numel(par.sExpNames)
 		a = mParams(:,6);
 		fprintf('exp-gauss failed in %d%% of cases\n', ...
 			round(100*sum(isnan(a))/numel(a)));
-		
+		b = mParams(:,5);
+		d = b - a;
+		d = d(~isnan(a) & ~isnan(b));
+		d = (d >= 0);
+		fprintf('cases UB >= u = %.03f\n', round(100*sum(d)/numel(d)));
 		
 		iDataset = iDataset + 1;
 	end
