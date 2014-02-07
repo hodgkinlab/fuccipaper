@@ -173,6 +173,30 @@ disp(num2str(boundsLo - paramVal <= 0));
 disp(' ');
 disp(num2str(boundsHi - boundsLo >= 0));
 
+for i = 1:4
+	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(1,2), boundsHi(1,2));
+	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(1,1), boundsHi(1,1));
+	
+	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(1,3), boundsHi(1,3));
+	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(1,4), boundsHi(1,4));
+	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(1,5), boundsHi(1,5));
+	
+	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(1,6), boundsHi(1,6));
+	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(1,7), boundsHi(1,7));
+	
+	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(1,8), boundsHi(1,8));
+	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(1,9), boundsHi(1,9));
+	
+	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(1,11), boundsHi(1,11));
+	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(1,10), boundsHi(1,10));
+	
+	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(1,13), boundsHi(1,13));
+	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(1,14), boundsHi(1,14));
+	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(1,12), boundsHi(1,12));
+	
+	fprintf(' ---------------- \n\n');
+end
+
 save(fullfile(par.sDataPath, 'boundsS1.mat'), ...
 	'paramVal', 'boundsLo', 'boundsHi');
 end
@@ -226,8 +250,9 @@ mParamsSample(5) = sHat;
 
 % 'stretched lognormal';
 vParam = lognfit(vc);
-mParamsSample(6) = vParam(1);
-mParamsSample(7) = vParam(2);
+[a, b] = lognstat(vParam(1), vParam(2));
+mParamsSample(6) = a;
+mParamsSample(7) = sqrt(b);
 
 % 'stretched inverse Gaussian';
 vParam = mle(vc, 'distribution', 'InverseGaussian');
