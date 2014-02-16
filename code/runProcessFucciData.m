@@ -111,7 +111,7 @@ if (0)
 	vAxesFitsG1 = [h1, h2, h3, h4];
 end
 % Tred VS Tgrn: 1.5 column, width = 4.49 inches
-if (0)
+if (1)
 	width = 4.49; ratio = 0.75;
 	fRG = figure('Name', 'red-grn', 'Position', [5 50 900 900*ratio]);
 	set(gcf, ...

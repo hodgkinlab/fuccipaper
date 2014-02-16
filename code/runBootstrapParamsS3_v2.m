@@ -16,7 +16,7 @@
 % License, v. 2.0. If a copy of the MPL was not distributed with this
 % file, You can obtain one at http://mozilla.org/MPL/2.0/.
 %}
-function runBootstrapParamsS3()
+function runBootstrapParamsS3_v2()
 clc, clearvars, close all, addpath(genpath('.'));
 reset(RandStream.getGlobalStream, 2013);
 par.sDataPath = '..\data';
@@ -84,9 +84,62 @@ for iExp = 1:numel(par.sExpNames)
 			mCellData = mCellDataAll(vSelect,:);
 			mCycleMeas = mCycleMeasAll(vSelect,:);
 		end
+		% split siblings
+		if (1)
+			% shuffle stuff
+			vPerm = randperm(nCells);
+			mCellData = mCellData(vPerm,:);
+			mCycleMeas = mCycleMeas(vPerm,:);
+			
+			% this code is for multiple cell wells;
+			% for single cell wells, we can simply look at well IDs
+			vMoms = mCellData(:,idxData.mom);
+			vWells = mCellData(:,idxData.well);
+			if (min(vMoms) < 1)
+				error('mother cell index should start with 1');
+			end
+			maxMom = max(vMoms);
+			vUniqueMoms = vWells .* maxMom + vMoms;
+			
+			% put sister cells together
+			[vUniqueMoms, vOrder] = sort(vUniqueMoms);
+			mCellData = mCellData(vOrder,:);
+			mCycleMeas = mCycleMeas(vOrder,:);
+			
+			% mark pairs and singles
+			vSingle = false(1, nCells);
+			iCell = 1;
+			while (iCell < nCells)
+				if (vUniqueMoms(iCell) == vUniqueMoms(iCell + 1))
+					iCell = iCell + 2;
+				else
+					vSingle(iCell) = true;
+					iCell = iCell + 1;
+				end
+			end
+			if (iCell == nCells)
+				vSingle(end) = true;
+			end
+			% unpaired cells
+			% 			mCellDataX	= mCellData(vSingle,:);
+			% 			mCycleMeasX = mCycleMeas(vSingle,:);
+			
+			% split siblings
+			mCellDataY	= mCellData(~vSingle,:);
+			mCycleMeasY = mCycleMeas(~vSingle,:);
+			mCellDataA	= mCellDataY(1:2:end,:);
+			mCycleMeasA = mCycleMeasY(1:2:end,:);
+			% 			mCellDataB	= mCellDataY(2:2:end,:);
+			% 			mCycleMeasB = mCycleMeasY(2:2:end,:);
+			
+			% 			nUnpaired = size(mCellDataX, 1);
+			% 			nPairs = size(mCellDataA, 1);
+			%fprintf('#pairs = %d; #unpaired = %d; ratio = %0.2f\n\n', ...
+			%	nPairs, nUnpaired, (double(nUnpaired)/double(2*nPairs)));
+		end
 		
-		par.mCellData = mCellData;
-		par.mCycleMeas = mCycleMeas;
+		par.mCellData = mCellDataA;
+		par.mCycleMeas = mCycleMeasA;
 		
 		currVal = estimateParams(par, false);
 		paramVal(iExp,:) = round(100*currVal)/100;
@@ -95,8 +148,6 @@ for iExp = 1:numel(par.sExpNames)
 		parfor i = 1:par.nSamples
 			mParams(i,:) = estimateParams(par, true);
 		end
-		
-		bounds{iExp} = mParams(:,5);
 		
 		mLims = prctile(mParams, [2.5, 97.5]);
 		mLims = round(100*mLims)/100;
@@ -128,8 +179,7 @@ disp(num2str(boundsLo - paramVal <= 0));
 disp(' ');
 disp(num2str(boundsHi - boundsLo >= 0));
 
-save('../data/bounds.mat', 'bounds');
-save(fullfile(par.sDataPath, 'boundsS3.mat'), ...
+save(fullfile(par.sDataPath, 'boundsS3_v2.mat'), ...
 	'paramVal', 'boundsLo', 'boundsHi');
 end
 

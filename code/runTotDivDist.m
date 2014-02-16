@@ -1,5 +1,5 @@
 %{
-% Bootstrapped confidence intervals for supplementary table S1
+% Fit different distributions to the total division time
 %
 % Data is drawn from experiments:
 % 20111118 - B cells, CpG
@@ -16,7 +16,7 @@
 % License, v. 2.0. If a copy of the MPL was not distributed with this
 % file, You can obtain one at http://mozilla.org/MPL/2.0/.
 %}
-function runBootstrapParamsS1()
+function runTotDivDist()
 clc, clearvars, close all, addpath(genpath('.'));
 reset(RandStream.getGlobalStream, 2013);
 par.sDataPath = '..\data';
@@ -26,8 +26,6 @@ par.nSamples = 1000;% used for computing bootstrap confidence intervals
 par.nParams = 14;
 
 groupDataFUCCI(par);
-par.vPropSG2M = [0.73 0.78 0.65 0.72];
-par.vPropG1 = 1 - par.vPropSG2M;
 
 idxData		= initTableCellData();
 idxCycle	= initTableCycleMeas();
@@ -35,11 +33,11 @@ par.idxData = idxData;
 par.idxCycle = idxCycle;
 
 paramVal = NaN(numel(par.sExpNames), par.nParams);
-boundsLo = NaN(numel(par.sExpNames), par.nParams);
-boundsHi = NaN(numel(par.sExpNames), par.nParams);
+
+vPropSG2M = [0.73 0.78 0.65 0.72];
+vPropG1 = 1 - vPropSG2M;
 
 iDataset = 1;
-matlabpool open;
 for iExp = 1:numel(par.sExpNames)
 	fprintf('%d\n', iExp);
 	
@@ -140,71 +138,14 @@ for iExp = 1:numel(par.sExpNames)
 		par.mCellDataA = mCellDataA;
 		par.mCycleMeasA = mCycleMeasA;
 		
-		currVal = estimateParams(par, false);
-		paramVal(iExp,:) = round(100*currVal)/100;
-		
-		mParams = NaN(par.nSamples, par.nParams);
-		parfor i = 1:par.nSamples
-			mParams(i,:) = estimateParams(par, true);
-		end
-		
-		moments{iExp} = mParams(:,3);
-		
-		mLims = prctile(mParams, [2.5, 97.5]);
-		mLims = round(100*mLims)/100;
-		boundsLo(iExp,:) = mLims(1,:);
-		boundsHi(iExp,:) = mLims(2,:);
-		
-		a = mParams(:,3);
-		fprintf('exp-gauss failed in %d%% of cases\n', ...
-			round(100*sum(isnan(a))/numel(a)));
-		
+		estimateParams(par, vPropG1(iExp));
+				
 		iDataset = iDataset + 1;
 	end
 end
-matlabpool close;
-disp(num2str(boundsLo));
-disp(' ');
-disp(num2str(paramVal));
-disp(' ');
-disp(num2str(boundsHi));
-disp(' ');
-disp(num2str(boundsHi - paramVal >= 0));
-disp(' ');
-disp(num2str(boundsLo - paramVal <= 0));
-disp(' ');
-disp(num2str(boundsHi - boundsLo >= 0));
-
-for i = 1:4
-	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(i,2), boundsHi(i,2));
-	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(i,1), boundsHi(i,1));
-	
-	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(i,3), boundsHi(i,3));
-	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(i,4), boundsHi(i,4));
-	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(i,5), boundsHi(i,5));
-	
-	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(i,6), boundsHi(i,6));
-	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(i,7), boundsHi(i,7));
-	
-	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(i,8), boundsHi(i,8));
-	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(i,9), boundsHi(i,9));
-	
-	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(i,11), boundsHi(i,11));
-	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(i,10), boundsHi(i,10));
-	
-	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(i,13), boundsHi(i,13));
-	fprintf('(%0.2f;\n%0.2f)\n', boundsLo(i,14), boundsHi(i,14));
-	fprintf('(%0.2f;\n%0.2f)\n\n', boundsLo(i,12), boundsHi(i,12));
-	
-	fprintf(' ---------------- \n\n');
 end
 
-save('../data/moments.mat', 'moments');
-save(fullfile(par.sDataPath, 'boundsS1.mat'), ...
-	'paramVal', 'boundsLo', 'boundsHi');
-end
-
-function mParamsSample = estimateParams(par, doSampling)
+function mParamsSample = estimateParams(par, kG1)
 mParamsSample = NaN(1, par.nParams);
 
 idxData = par.idxData;
@@ -215,65 +156,104 @@ mCycleMeasA = par.mCycleMeasA;
 vc = mCellDataA(:,idxData.stop) - mCellDataA(:,idxData.start);
 va = mCycleMeasA(:,idxCycle.timeGrnOn);
 
-if (doSampling)
-	randMap = randsample(1:numel(vc), numel(vc), true);
-	vc = vc(randMap);
-	va = va(randMap);
-end
-
 vb = vc - va;
 va = va(:);
 vb = vb(:);
+t = linspace(0, max(vc), 50);
 
-% 'lag-exponential';
+figure;
 [f, x] = ecdf(vc);
-x = x(f < 1); f = f(f < 1); f = log(1 - f);
-p = polyfit(x, f, 1);
-vParam(1) = -p(2)/p(1); vParam(2) = -p(1);
-mParamsSample(1) = vParam(1);
-mParamsSample(2) = vParam(2);
+plot(x, f, 'LineStyle', 'none', 'Marker', '*');
 
-% 'exp+gauss';
-m = mean(vc);
-s = std(vc);
-y = skewness(vc);
 
-if (y <= 0)
-	uHat = NaN;
-	sHat = NaN;
-	lHat = NaN;
-else
-	uHat = m - s*nthroot(y/2, 3);
-	sHat = s*sqrt(1 - nthroot(y/2, 3).^2);
-	lHat = 1 / (s*nthroot(y/2, 3));
-end
-mParamsSample(3) = lHat;
-mParamsSample(4) = uHat;
-mParamsSample(5) = sHat;
+% stretched lognormal
+par = lognfit(vc);
+y = logncdf(t, par(1), par(2));
+hold on; plot(t, y, 'color', 'k');
 
-% 'stretched lognormal';
-vParam = lognfit(vc);
-[a, b] = lognstat(vParam(1), vParam(2));
-mParamsSample(6) = a;
-mParamsSample(7) = sqrt(b);
+[~, pa] = kstest(va, [va, logncdf(va./kG1, par(1), par(2))]);
+[~, pb] = kstest(vb, [vb, logncdf(vb./(1 - kG1), par(1), par(2))]);
+[~, pc] = kstest(vc, [vc, logncdf(vc, par(1), par(2))]);
 
-% 'stretched inverse Gaussian';
-vParam = mle(vc, 'distribution', 'InverseGaussian');
-mParamsSample(8) = vParam(1);
-mParamsSample(9) = vParam(2);
+[m, v] = lognstat(par(1), par(2));
+fprintf('lognormal, mean = %0.3f, std = %0.3f\n', m, sqrt(v));
+fprintf(' pa = %0.5f\n', pa);
+fprintf(' pb = %0.5f\n', pb);
+fprintf(' pc = %0.5f\n', pc);
 
-% 'lag-exponential 2';
-vParam(1) = min(vc);
-vParam(2) = 1 / (mean(vc) - vParam(1));
-mParamsSample(10) = vParam(1);
-mParamsSample(11) = vParam(2);
 
-% 'exp+gauss 2';
-lHat = 1 / mean(va);
-uHat = mean(vb);
-sHat = std(vb, 1);
-mParamsSample(12) = uHat;
-mParamsSample(13) = sHat;
-mParamsSample(14) = lHat;
+% stretched gamma
+par = gamfit(vc);
+y = gamcdf(t, par(1), par(2));
+hold on; plot(t, y, 'color', 'r');
+
+[~, pa] = kstest(va, [va, gamcdf(va./kG1, par(1), par(2))]);
+[~, pb] = kstest(vb, [vb, gamcdf(vb./(1 - kG1), par(1), par(2))]);
+[~, pc] = kstest(vc, [vc, gamcdf(vc, par(1), par(2))]);
+
+[m, v] = gamstat(par(1), par(2));
+fprintf('gamma, mean = %0.3f, std = %0.3f\n', m, sqrt(v));
+fprintf(' pa = %0.5f\n', pa);
+fprintf(' pb = %0.5f\n', pb);
+fprintf(' pc = %0.5f\n', pc);
+
+
+% stretched weibull
+par = wblfit(vc);
+y = wblcdf(t, par(1), par(2));
+hold on; plot(t, y, 'color', 'g');
+
+[~, pa] = kstest(va, [va, wblcdf(va./kG1, par(1), par(2))]);
+[~, pb] = kstest(vb, [vb, wblcdf(vb./(1 - kG1), par(1), par(2))]);
+[~, pc] = kstest(vc, [vc, wblcdf(vc, par(1), par(2))]);
+
+[m, v] = wblstat(par(1), par(2));
+fprintf('weib, mean = %0.3f, std = %0.3f\n', m, sqrt(v));
+fprintf(' pa = %0.5f\n', pa);
+fprintf(' pb = %0.5f\n', pb);
+fprintf(' pc = %0.5f\n', pc);
+
+
+% stretched normal
+[par1, par2] = normfit(vc);
+par = [par1, par2];
+y = normcdf(t, par(1), par(2));
+hold on; plot(t, y, 'color', 'c');
+
+[~, pa] = kstest(va, [va, normcdf(va./kG1, par(1), par(2))]);
+[~, pb] = kstest(vb, [vb, normcdf(vb./(1 - kG1), par(1), par(2))]);
+[~, pc] = kstest(vc, [vc, normcdf(vc, par(1), par(2))]);
+
+fprintf('normal, mean = %0.3f, std = %0.3f\n', par1, par2);
+fprintf(' pa = %0.5f\n', pa);
+fprintf(' pb = %0.5f\n', pb);
+fprintf(' pc = %0.5f\n', pc);
+
+
+% stretched inverse Gaussian
+par = mle(vc, 'distribution', 'InverseGaussian');
+invgcdf = @(x, u, l) ...
+	normcdf(sqrt(l./x).*(x/u - 1), 0, 1) ...
+	+ exp(2*l/u)*normcdf(-sqrt(l./x).*(x/u + 1), 0, 1);
+
+y = invgcdf(t, par(1), par(2));
+hold on; plot(t, y, 'color', 'y');
+
+f = invgcdf(va./kG1, par(1), par(2));
+f = round(10000*f)/10000;
+[~, pa] = kstest(va, [va, f]);
+f = invgcdf(vb./(1 - kG1), par(1), par(2));
+f = round(10000*f)/10000;
+[~, pb] = kstest(vb, [vb, f]);
+f = invgcdf(vc, par(1), par(2));
+f = round(10000*f)/10000;
+[~, pc] = kstest(vc, [vc, f]);
+
+m = par(1);
+s = sqrt(par(1)^3/par(2));
+fprintf('inv-gauss, mean = %0.3f, std = %0.3f\n', m, s);
+fprintf(' pa = %0.5f\n', pa);
+fprintf(' pb = %0.5f\n', pb);
+fprintf(' pc = %0.5f\n', pc);
 
 end

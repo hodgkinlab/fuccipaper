@@ -108,7 +108,7 @@ disp(vCoeffs);
 
 % 95% confidence intervals
 mCI = bootci(par.nSamples, @fitLinearModelSample, mVar1, mVar2);
-% disp(mCI);
+disp(mCI);
 
 stats.vCoeffs = vCoeffs;
 stats.mCI = mCI;
