@@ -29,13 +29,23 @@ data/
 20120316-info.mat
 20120413-info.mat
 
-Scripts [runBootstrapParamsS1.m] and [runBootstrapParamsS3.m] produce bootstrapped confidence intervals for parameters from Supplementary Tables S1 amd S3. These scripts create files
+Scripts [runBootstrapParamsS1.m], [runBootstrapParamsS3.m] and [runBootstrapParamsS3_v2] produce bootstrapped confidence intervals for parameters from Supplementary Tables S1 amd S3. The difference between [*S3.m] and [*S3_v2.m] is that the former uses a complete dataset for each condition, whereas the latter uses a set of randomly chosen siblings from all sibling pairs for each condition. Table S3 presetned in the paper is generated using [*S3_v2.m]. Together these 3 scripts create files:
 
 data/
 boundsS1.mat
 boundsS3.mat
+boundsS3_v2.mat
+
+... as well as these auxiliary files:
+data/
+bounds.mat
+moments.mat
+
+Script [runBoundsVSMoments.m] compares estimated bounds from [data/bounds.mat] to estimated parameters of EMG recorded in [data/moments.mat]. This script is not used in the current version of the paper.
 
 Script [runBootstrapParamsS2.m] produces bootstrapped confidence intervals for parameters from Supplementary Table S2. The intervals are printed in the console.
+
+Script [runTotDivDist.m] fits various distributions (e.g., lognormal, gamma, Weibull) to data.
 
 
 === Section 2: Processing FACS data ===
