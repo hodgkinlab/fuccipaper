@@ -335,6 +335,8 @@ for iExp = 1:numel(par.sExpNames)
 		end
 		% alpha plots and comparison with SM models
 		if (1)
+%			vc = mCellData(:,idxData.stop) - mCellData(:,idxData.start);
+%			va = mCycleMeas(:,idxCycle.timeGrnOn);
 			vc = mCellDataA(:,idxData.stop) - mCellDataA(:,idxData.start);
 			va = mCycleMeasA(:,idxCycle.timeGrnOn);
 			vb = vc - va;
